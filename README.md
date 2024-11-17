@@ -17,3 +17,6 @@ Install the package using npm:
 
 ```bash
 npm install SESEmailSenderV3
+```
+
+For detailed documentation, visit the [Wiki](https://github.com/Manickam-venkatachalam/SESEmailSenderV3/wiki).

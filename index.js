@@ -97,29 +97,29 @@ exports.sendEmail = async function (params, awsConfigParams) {
           throw error;
         }
       }
-
-
-      const SES = new SESClient(awsConfig);
-      const sesParams = {
-        Source: params.FromEmailAddress,
-        Destination: {
-          ToAddresses: params.ToAddresses,
-          CcAddresses: params.CcAddresses || []
-        },
-        Message: {
-          Subject: {
-            Data: params.Subject
+      else {
+        const SES = new SESClient(awsConfig);
+        const sesParams = {
+          Source: params.FromEmailAddress,
+          Destination: {
+            ToAddresses: params.ToAddresses,
+            CcAddresses: params.CcAddresses || []
           },
-          Body: {
-            Html: {
-              Data: emailBody
+          Message: {
+            Subject: {
+              Data: params.Subject
+            },
+            Body: {
+              Html: {
+                Data: emailBody
+              }
             }
           }
-        }
-      };
-      let data = await SES.send(new SendEmailCommand(sesParams));
-      resolve ({ statusCode: 200, message: "Success" });
-
+        };
+        await SES.send(new SendEmailCommand(sesParams));
+        resolve ({ statusCode: 200, message: "Success" });
+      }
+      
     } catch (error) {
       reject ({ statusCode: 400, message: "Error occurred while sending email", error });
     }
