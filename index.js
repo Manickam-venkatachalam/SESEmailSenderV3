@@ -45,11 +45,13 @@ exports.sendEmail = async function (params, awsConfigParams) {
   }
   
   if (awsConfig.region === '') throw new Error("Region is not defined in SESEmailSenderV2 is mandatory.");
-  if (!params.FromEmailAddress) throw new Error("Sender email address (FromEmailAddress) is mandatory.");
-  if (!params.ToAddresses || params.ToAddresses.length === 0) throw new Error("At least one recipient email address (ToAddresses) is mandatory.");
-  if (!params.Subject) throw new Error("Email subject (Subject) is mandatory.");
-  if (params.BucketName !== '' && params.BodyTemplate === '') throw new Error("BodyTemplate Template key is requried");
-  if (params.AttachmentBucketName !== '' && ( !params?.attachmentKeys || params?.attachmentKeys?.length === 0)) throw new Error("AttachmentKeys are required to send attachments but are missing. Remove AttachmentBucketName if no attachments are intended.");
+  if (!FromEmailAddress) throw new Error("Sender email address (FromEmailAddress) is mandatory.");
+  if (!ToAddresses || params.ToAddresses.length === 0) throw new Error("At least one recipient email address (ToAddresses) is mandatory.");
+  if (!Subject) throw new Error("Email subject (Subject) is mandatory.");
+  if (BucketName !== '' && BodyTemplate === '') throw new Error("BodyTemplate Template key is requried");
+  if (AttachmentBucketName && (!attachmentKeys || attachmentKeys.length === 0)) {
+    throw new Error("AttachmentKeys are required to send attachments but are missing. Remove AttachmentBucketName if no attachments are intended.");
+  }
   return new Promise(async (resolve, reject)=>{
     try {
       let emailBody = "No email body template provided.";
