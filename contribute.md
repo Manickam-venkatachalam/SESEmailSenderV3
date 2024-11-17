@@ -53,7 +53,7 @@ git push origin feature/your-feature-name
 
 ## Reporting Issues
 If you encounter bugs or have feature requests:
-1. Check if the issue already exists in [Issues](https://github.com/your-username/AWSSES-email-senderV3/issues).
+1. Check if the issue already exists in [Issues](https://github.com/Manickam-venkatachalam/SESEmailSenderV3/issues).
 2. If not, create a new issue with:
    - A clear title.
    - Steps to reproduce (if applicable).
