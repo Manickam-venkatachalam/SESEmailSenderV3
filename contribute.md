@@ -65,4 +65,4 @@ Thank you for contributing! 🎉
 
 --- 
 
-Let me know if you'd like to customize this further!
+Feel free to reach out for customizations at hello@manickam.me!
