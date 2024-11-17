@@ -92,7 +92,7 @@ exports.sendEmail = async function (params, awsConfigParams) {
         };
         try{
           await sendMailWithAttachment(mailOptions, awsConfig);
-          resolve ({ statusCode: 200, message: "Success", messageID: data.MessageId });
+          resolve ({ statusCode: 200, message: "Success" });
         } catch(error){
           throw error;
         }
@@ -118,7 +118,7 @@ exports.sendEmail = async function (params, awsConfigParams) {
         }
       };
       let data = await SES.send(new SendEmailCommand(sesParams));
-      resolve ({ statusCode: 200, message: "Success", messageID: data.MessageId });
+      resolve ({ statusCode: 200, message: "Success" });
 
     } catch (error) {
       reject ({ statusCode: 400, message: "Error occurred while sending email", error });

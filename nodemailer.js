@@ -11,9 +11,7 @@ class nodeMailer{
             transporter.sendMail(
                 emailOptions,
                 (error) => {
-                    if(error) throw error
-                    envelopeID = info.envelope;
-                    messageID = info.messageId;
+                    if(error) throw error;
                 }
             );
             return { statusCode: 200, message: "Success"}; 
