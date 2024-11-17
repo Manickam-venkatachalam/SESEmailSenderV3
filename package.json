@@ -1,6 +1,6 @@
 {
   "name": "sesemailsenderv3",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Node.js library for sending emails using AWS SES SDK v3 with S3 attachments.",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,6 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
     "@aws-sdk/client-ses": "^3.693.0",
-    "@aws-sdk/client-sesv2": "^3.693.0",
     "nodemailer": "^6.9.16"
   }
 }
