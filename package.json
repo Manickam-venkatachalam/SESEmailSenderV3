@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/SESEmailSenderV3.git"
+    "url": "https://github.com/Manickam-venkatachalam/SESEmailSenderV3.git"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",

@@ -1,4 +1,4 @@
-# AWS Email Sender
+# AWS Email SES Sender
 
 AWS Email Sender is a versatile library for sending emails using AWS SES (Simple Email Service) and optionally attaching files from S3. It also supports sending emails using Nodemailer for attachments.
 
