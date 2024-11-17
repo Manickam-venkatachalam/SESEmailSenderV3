@@ -16,4 +16,4 @@ AWS Email Sender is a versatile library for sending emails using AWS SES (Simple
 Install the package using npm:
 
 ```bash
-npm install aws-email-sender
+npm install SESEmailSenderV3
