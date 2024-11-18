@@ -1,9 +1,10 @@
 let nodemailer = require("nodemailer");
 let aws = require("@aws-sdk/client-ses");
+const {getAWSClient} = require('./clientConfiguration.js');
 
 class nodeMailer{
-    async  sendMailWithAttachment(emailOptions, awsConfig){
-        let ses = new aws.SES(awsConfig);
+    async  sendMailWithAttachment(emailOptions, sesRegion, credentials){
+        let ses = getAWSClient('ses', sesRegion, credentials);
         let transporter = nodemailer.createTransport({
             SES: { ses, aws },
           });

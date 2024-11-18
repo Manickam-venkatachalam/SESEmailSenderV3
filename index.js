@@ -1,11 +1,15 @@
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
-const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
-const {sendMailWithAttachment} = require('./nodemailer.js')
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
+const { SendEmailCommand } = require("@aws-sdk/client-ses");
+const {sendMailWithAttachment} = require('./nodemailer.js');
+const {getAWSClient} = require('./clientConfiguration.js');
 /**
  * Initializes the EmailService with AWS configuration.
- * @param {object} awsConfigParams AWS configuration with region and credentials
- * @param {string} awsConfigParams.region AWS region (mandatory)
- * @param {object} awsConfigParams.credentials AWS credentials object containing `accessKeyId` and `secretAccessKey` (or) `defaultProvider`
+ * @param {object} awsConfigParams AWS configuration with regions and credentials
+ * @param {string} awsConfigParams.region Default AWS region (mandatory, used if specific service regions are not provided)
+ * @param {object} awsConfigParams.credentials AWS credentials object containing `accessKeyId` and `secretAccessKey`, or a credentials provider (optional)
+ * @param {string} [awsConfigParams.s3TemplateRegion] AWS region for fetching email body templates from S3 (optional)
+ * @param {string} [awsConfigParams.sesRegion] AWS region for sending emails via SES (optional)
+ * @param {string} [awsConfigParams.s3AttachementsRegion] AWS region for fetching email attachments from S3 (optional)
  */
 
 /**
@@ -41,10 +45,13 @@ exports.sendEmail = async function (params, awsConfigParams) {
 
   let awsConfig =  {
     region :  awsConfigParams?.region || '',
-    credentials : awsConfigParams?.credentials || null
+    credentials : awsConfigParams?.credentials || null,
+    s3TemplateRegion : awsConfigParams?.s3TemplateRegion || null,
+    sesRegion: awsConfigParams?.sesRegion || null,
+    s3AttachementsRegion: awsConfigParams?.s3AttachementsRegion || null,
   }
   
-  if (awsConfig.region === '') throw new Error("Region is not defined in SESEmailSenderV2 is mandatory.");
+  if (awsConfig.region === '') throw new Error("Region is not defined in SESEmailSenderV3 is mandatory.");
   if (!FromEmailAddress) throw new Error("Sender email address (FromEmailAddress) is mandatory.");
   if (!ToAddresses || params.ToAddresses.length === 0) throw new Error("At least one recipient email address (ToAddresses) is mandatory.");
   if (!Subject) throw new Error("Email subject (Subject) is mandatory.");
@@ -52,10 +59,15 @@ exports.sendEmail = async function (params, awsConfigParams) {
   if (AttachmentBucketName && (!attachmentKeys || attachmentKeys.length === 0)) {
     throw new Error("AttachmentKeys are required to send attachments but are missing. Remove AttachmentBucketName if no attachments are intended.");
   }
+
+  let s3Region = awsConfig.s3TemplateRegion ? awsConfig.s3TemplateRegion : awsConfig.region;
+  let sesRegion = awsConfig.sesRegion ? awsConfig.sesRegion : awsConfig.region;
+  let s3AttachementsRegion = awsConfig.s3AttachementsRegion ? awsConfig.s3AttachementsRegion : awsConfig.region;
+
   return new Promise(async (resolve, reject)=>{
     try {
       let emailBody = "No email body template provided.";
-      let s3Client = new S3Client(awsConfig);
+      let s3Client = getAWSClient('s3', s3Region, awsConfig.credentials);
 
       let streamToString = (stream) =>
         new Promise((resolve, reject) => {
@@ -79,6 +91,7 @@ exports.sendEmail = async function (params, awsConfigParams) {
 
       if (attachmentKeys.length > 0 && AttachmentBucketName) {
         let fileAttachments = [];
+        s3Client = getAWSClient('s3', s3AttachementsRegion, awsConfig.credentials);
         for (let key of attachmentKeys) {
           let fileData = await s3Client.send(new GetObjectCommand({ Bucket: AttachmentBucketName, Key: key }));
           let fileContent = fileData.Body;
@@ -93,15 +106,15 @@ exports.sendEmail = async function (params, awsConfigParams) {
           attachments: fileAttachments,
         };
         try{
-          await sendMailWithAttachment(mailOptions, awsConfig);
+          await sendMailWithAttachment(mailOptions, sesRegion, awsConfig.credentials);
           resolve ({ statusCode: 200, message: "Success" });
         } catch(error){
           throw error;
         }
       }
       else {
-        const SES = new SESClient(awsConfig);
-        const sesParams = {
+        const SES = getAWSClient('ses', sesRegion, awsConfig.credentials);
+        let sesParams = {
           Source: params.FromEmailAddress,
           Destination: {
             ToAddresses: params.ToAddresses,
