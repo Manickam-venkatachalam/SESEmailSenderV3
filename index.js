@@ -1,12 +1,15 @@
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
-const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
+const { GetObjectCommand } = require("@aws-sdk/client-s3");
+const { SendEmailCommand } = require("@aws-sdk/client-ses");
 const {sendMailWithAttachment} = require('./nodemailer.js');
 const {getAWSClient} = require('./clientConfiguration.js');
 /**
  * Initializes the EmailService with AWS configuration.
- * @param {object} awsConfigParams AWS configuration with region and credentials
- * @param {string} awsConfigParams.region AWS region (mandatory)
- * @param {object} awsConfigParams.credentials AWS credentials object containing `accessKeyId` and `secretAccessKey` (or) `defaultProvider`
+ * @param {object} awsConfigParams AWS configuration with regions and credentials
+ * @param {string} awsConfigParams.region Default AWS region (mandatory, used if specific service regions are not provided)
+ * @param {object} awsConfigParams.credentials AWS credentials object containing `accessKeyId` and `secretAccessKey`, or a credentials provider (optional)
+ * @param {string} [awsConfigParams.s3TemplateRegion] AWS region for fetching email body templates from S3 (optional)
+ * @param {string} [awsConfigParams.sesRegion] AWS region for sending emails via SES (optional)
+ * @param {string} [awsConfigParams.s3AttachementsRegion] AWS region for fetching email attachments from S3 (optional)
  */
 
 /**
@@ -57,8 +60,8 @@ exports.sendEmail = async function (params, awsConfigParams) {
     throw new Error("AttachmentKeys are required to send attachments but are missing. Remove AttachmentBucketName if no attachments are intended.");
   }
 
-  let s3Region = awsConfig.s3TemplateRegion ? awsConfig.region : awsConfig.region;
-  let sesRegion = awsConfig.sesRegion ? awsConfig.region : awsConfig.region;
+  let s3Region = awsConfig.s3TemplateRegion ? awsConfig.s3TemplateRegion : awsConfig.region;
+  let sesRegion = awsConfig.sesRegion ? awsConfig.sesRegion : awsConfig.region;
   let s3AttachementsRegion = awsConfig.s3AttachementsRegion ? awsConfig.s3AttachementsRegion : awsConfig.region;
 
   return new Promise(async (resolve, reject)=>{
